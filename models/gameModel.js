@@ -7,6 +7,6 @@ const gameSchema = new Schema({
 }, {timestamps: true}
 )
 
-const Game = mongoose.model('Game', gameSchema)
+const GameModel = mongoose.model('Game', gameSchema)
 
-module.exports = Game
+module.exports = GameModel

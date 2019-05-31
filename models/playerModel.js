@@ -29,6 +29,6 @@ playerSchema.virtual('gamesPlayed').get(() => {
   return (wins + losses).toFixed();
 })
 
-const Player = mongoose.model( 'Player', playerSchema)
+const PlayerModel = mongoose.model( 'Player', playerSchema)
 
-module.exports = Player
+module.exports = PlayerModel
