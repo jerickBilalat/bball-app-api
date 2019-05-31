@@ -5,6 +5,8 @@ const cors = require('cors')
 const morgan = require('morgan')
 const app = express();
 
+mongoose.connect('mongodb://localhost:27017/bball_app_dev',{useNewUrlParser: true})
+
 app.get('/', (req, res) => {
   res.send('hello world')
 })
