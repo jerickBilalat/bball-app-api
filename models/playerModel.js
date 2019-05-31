@@ -9,26 +9,22 @@ const playerSchema = new Schema({
     minlength: 2
   },
   wins: {
-    type: String,
+    type: Number,
     required: true
   },
   losses: {
-    type: String,
+    type: Number,
     required: true 
   }
 })
 
 playerSchema.virtual('winningPercentage').get(() => {
-  const wins = Number.parseInt(this.wins),
-        losses = Number.parseInt(this.losses),
-        totalGamesPlayed = wins + losses;
-  return wins !== 0 ? Number.parseFloat(wins * 100 / totalGamesPlayed).toFixed(2): "0.00";
+  const totalGamesPlayed = this.wins + this.losses
+  return this.wins !== 0 ? Number.parseFloat(this.wins * 100 / totalGamesPlayed).toFixed(2): "0.00";
 })
 
 playerSchema.virtual('gamesPlayed').get(() => {
-  const wins = Number.parseInt(this.wins),
-        losses = Number.parseInt(this.losses);
-  return (wins + losses).toFixed();
+  return this.wins + this.losses
 })
 
 const PlayerModel = mongoose.model( 'Player', playerSchema)
