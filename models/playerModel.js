@@ -4,7 +4,9 @@ const Schema = mongoose.Schema
 const playerSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
+    unique: 1,
+    minlength: 2
   },
   wins: {
     type: String,

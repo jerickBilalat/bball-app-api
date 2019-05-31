@@ -2,8 +2,12 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const gameSchema = new Schema({
-  winners: Array,
-  losers: Array
+  winners: [{
+    type: Schema.Types.ObjectId
+  }],
+  losers: [{
+    type: Schema.Types.ObjectId
+  }]
 }, {timestamps: true}
 )
 
