@@ -13,9 +13,48 @@ function getAllGames(req, res, next) {
     .sort("updatedAt")
     .exec( (err, games) => {
       if(err) return next(err)
-      res.send(games)
+
+      res.send({gameList: games, mostPlayedGameType: getMostPlayedGameType(games)})
     })
 }
+
+function getMostPlayedGameType(gamesCollection) {
+  let gameTypes = [0,0,0]
+  let mostPlayedGameType = 3
+
+  gamesCollection.forEach( gameRecord => {
+    switch (gameRecord.winners.length) {
+      case 3:
+        gameTypes[0] += 1
+        break
+      case 4:
+        gameTypes[1] += 1
+        break
+      case 5:
+        gameTypes[2] += 1
+        break
+      default:
+        throw new Error("Team length must be 3,4,or 5")
+    }
+  })
+  
+  switch(gameTypes.lastIndexOf(Math.max(...gameTypes))) {
+    case 0:
+        mostPlayedGameType = 3
+      break
+    case 1:
+        mostPlayedGameType = 4
+      break
+    case 2:
+        mostPlayedGameType = 5
+      break
+    default:
+      throw new Error("team types is not valid")
+  }
+
+  return mostPlayedGameType
+}
+
 
 function createGame(req, res, next) {
   const {winners, losers} = req.body
