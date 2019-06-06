@@ -4,8 +4,13 @@ const mongoose = require('mongoose')
 const GameModel = require('../models/gameModel')
 const PlayerModel = require('../models/playerModel')
 
+const passport = require('passport')
+const passportService = require('../services/passport')
+// passport middlewares
+const requireAuth = passport.authenticate('jwt', { session: false });
+
 router.get('/', getAllGames)
-router.post('/create_game', createGame)
+router.post('/create_game', requireAuth, createGame)
 
 function getAllGames(req, res, next) {
   GameModel
