@@ -7,7 +7,15 @@ const gameSchema = new Schema({
   }],
   losers: [{
     type: Schema.Types.ObjectId
-  }]
+  }],
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    required: true
+  },
+  updatedBy: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  }
 }, {timestamps: true}
 )
 

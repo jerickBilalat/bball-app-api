@@ -12,9 +12,12 @@ const AuthRoutes = require('./routes/authRoutes')
 
 mongoose.connect('mongodb://localhost:27017/bball_app_dev',{useNewUrlParser: true})
 
+// passport service
+require('./services/passport')
+
 app.use(cors());
 app.use(bodyParser.urlencoded({extended:true}))
-app.use(bodyParser.json());
+app.use(bodyParser.json({type: '*/*'}));
 app.use(morgan('tiny'));
 
 // routes

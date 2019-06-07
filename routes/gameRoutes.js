@@ -4,14 +4,19 @@ const mongoose = require('mongoose')
 const GameModel = require('../models/gameModel')
 const PlayerModel = require('../models/playerModel')
 
+const requireLogin = require('../middleware/requireLogin');
+
 const passport = require('passport')
-const passportService = require('../services/passport')
-// passport middlewares
-const requireAuth = passport.authenticate('jwt', { session: false });
+
 
 router.get('/', getAllGames)
-router.post('/create_game', requireAuth, createGame)
+router.post('/create_game',
+  requireLogin,
+  createGame)
 
+
+
+  
 function getAllGames(req, res, next) {
   GameModel
     .find()
@@ -62,8 +67,11 @@ function getMostPlayedGameType(gamesCollection) {
 
 
 function createGame(req, res, next) {
-  const {winners, losers} = req.body
-
+  const {winners, losers} = req.body,
+        {sub: creatorId, admin} = req.user
+  
+  if(!admin) return res.status(401).send({error: {message: "User is not an admin"}})
+  console.log(req.user)
   // update player stats
   winners.forEach( playerId => {
     PlayerModel
@@ -83,7 +91,7 @@ function createGame(req, res, next) {
   
   // create game
   GameModel
-    .create(req.body, (err, game) => {
+    .create({winners, losers, createdBy: creatorId, updatedBy: creatorId}, (err, game) => {
       if(err) return next(err)
       res.send(game)
     })

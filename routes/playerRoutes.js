@@ -1,15 +1,15 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
+
+const requireLogin = require('../middleware/requireLogin')
 const PlayerModel = require('../models/playerModel')
 
-const passport = require('passport')
-const passportService = require('../services/passport')
-// passport middlewares
-const requireAuth = passport.authenticate('jwt', { session: false });
-
 router.get('/', getAllPlayers)
-router.post('/create_player', requireAuth, createPlayer)
+router.post('/create_player',
+  requireLogin,
+  createPlayerHandler)
+
 
 function getAllPlayers(req, res, next) {
   PlayerModel
@@ -21,7 +21,7 @@ function getAllPlayers(req, res, next) {
     })
 }
 
-function createPlayer(req, res, next) {
+function createPlayerHandler(req, res, next) {
   PlayerModel
     .create(req.body, (err, player) => {
       if(err) return next(err)

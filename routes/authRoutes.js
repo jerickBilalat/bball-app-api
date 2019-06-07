@@ -1,24 +1,41 @@
 const jwt = require('jwt-simple')
-const User = require('../models/userModel')
 const router = require('express').Router()
-const passport = require('passport')
-const passportService = require('../services/passport')
+
+const User = require('../models/userModel')
+const authenticateLocalLogin = require('../middleware/authenticateLocalLogin');
 
 // todo put secret in the env
-const secret = "pinoybball#2019"
+const secret = "pinoybball2019"
 
-const requireSignIn = passport.authenticate('local', {session: false})
 
-router.post('/signin', requireSignIn, signIn )
-router.post('/signup', signUp)
+router.post('/signin',
+  authenticateLocalLogin,
+  signInHandler )
 
-function signIn(req, res, next) {
-  res.send({token: generateToken(req.user)})
+router.post('/signup', signUpHandler)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function signInHandler(req, res, next) {
+  const {name, _id} = req.user,
+        token = generateAdminToken(req.user)
+  res.send({user: {name, _id}, token })
 }
 
-function signUp(req, res, next) {
+function signUpHandler(req, res, next) {
   const {name, password} = req.body
-  // todo validation
+  // todo validation or sanitize input
   User.findOne({name}, (err, existingUser) => {
 
     if(err) return next(err)
@@ -34,16 +51,16 @@ function signUp(req, res, next) {
 
     user.save(err => {
       if(err) return next(err)
-      res.json({token: generateToken(user)})
+      res.json({user: {name: user.name, _id: user._id}, token: generateAdminToken(user)})
     })
 
   })
 }
 
-function generateToken(user) {
+function generateAdminToken(user) {
   const timestamp = new Date().getTime()
-  const expirationForOneDay = timestamp + 86400000 
-  return jwt.encode({ sub: user.id, iat: timestamp, admin: true, exp: expirationForOneDay }, secret);
+  const oneDay = timestamp + 86400000 
+  return jwt.encode({ sub: user._id, iat: timestamp, admin: true, exp: oneDay }, secret, 'HS256');
 }
 
 module.exports = router

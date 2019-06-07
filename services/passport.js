@@ -11,6 +11,7 @@ const secret = "pinoybball2019"
 // Create local strategy
 const localOptions = { usernameField: 'name' };
 const localLogin = new LocalStrategy(localOptions, function(name, password, done) {
+  console.log('local login')
   // Verify this name and password, call done with the user
   // if it is the correct name and password
   // otherwise, call done with false
@@ -29,32 +30,29 @@ const localLogin = new LocalStrategy(localOptions, function(name, password, done
   });
 });
 
+// todo jwt strategy currently not working
 // Setup options for JWT Strategy
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
   secretOrKey: secret
 };
 
 // Create JWT strategy
-const jwtLogin = new JwtStrategy(jwtOptions, function(payload, done) {
-  // See if the user ID in the payload exists in our database
-  // If it does, call 'done' with that other
-  // otherwise, call done without a user object
-  User.findById(payload.sub, function(err, user) {
-    if (err) { return done(err, false); }
-
-    if (user) {
-      done(null, user);
-    } else {
-      done(null, false);
-    }
+passport.use(new JwtStrategy(jwtOptions, function(jwt_payload, done) {
+  console.log("hit jwt login route")
+  User.findOne({id: jwt_payload.sub}, function(err, user) {
+      if (err) {
+        console.log(err)
+          return done(err, false);
+      }
+      if (user) {
+          return done(null, user);
+      } else {
+          return done(null, false);
+          // or you could create a new account
+      }
   });
-});
+}));
 
 // Tell passport to use this strategy
-passport.use(jwtLogin);
 passport.use(localLogin);
-
-
-const requireAuth = passport.authenticate('jwt', { session: false })
-const requireSignin = passport.authenticate('local', { session: false })
