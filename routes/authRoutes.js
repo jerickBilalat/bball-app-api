@@ -29,7 +29,7 @@ router.post('/signup', signUpHandler)
 
 function signInHandler(req, res, next) {
   const {name, _id} = req.user,
-        token = generateAdminToken(req.user)
+        token = generateToken(req.user)
   res.send({user: {name, _id}, token })
 }
 
@@ -51,16 +51,20 @@ function signUpHandler(req, res, next) {
 
     user.save(err => {
       if(err) return next(err)
-      res.json({user: {name: user.name, _id: user._id}, token: generateAdminToken(user)})
+      res.json({user: {name: user.name, _id: user._id}, token: generateToken(user)})
     })
 
   })
 }
 
-function generateAdminToken(user) {
+function generateToken(user) {
   const timestamp = new Date().getTime()
-  const oneDay = timestamp + 86400000 
-  return jwt.encode({ sub: user._id, iat: timestamp, admin: true, exp: oneDay }, secret, 'HS256');
+  if(user.admin) {
+    const oneDay = timestamp + 86400000
+    return jwt.encode({ sub: user._id, iat: timestamp, admin: true, exp: oneDay }, secret)
+  }
+  
+  return jwt.encode({ sub: user._id, iat: timestamp}, secret)
 }
 
 module.exports = router
