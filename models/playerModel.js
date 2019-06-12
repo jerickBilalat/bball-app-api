@@ -17,15 +17,15 @@ const playerSchema = new Schema({
     required: true 
   }
 })
+// todo delete?
+// playerSchema.virtual('winningPercentage').get(() => {
+//   const totalGamesPlayed = this.wins + this.losses
+//   return this.wins !== 0 ? Number.parseFloat(this.wins * 100 / totalGamesPlayed).toFixed(2): "0.00";
+// })
 
-playerSchema.virtual('winningPercentage').get(() => {
-  const totalGamesPlayed = this.wins + this.losses
-  return this.wins !== 0 ? Number.parseFloat(this.wins * 100 / totalGamesPlayed).toFixed(2): "0.00";
-})
-
-playerSchema.virtual('gamesPlayed').get(() => {
-  return this.wins + this.losses
-})
+// playerSchema.virtual('gamesPlayed').get(() => {
+//   return this.wins + this.losses
+// })
 
 const PlayerModel = mongoose.model( 'Player', playerSchema)
 
