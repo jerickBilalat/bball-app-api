@@ -8,11 +8,14 @@ const requireLogin = require('../middleware/requireLogin');
 
 const passport = require('passport')
 
+//utils
+const {capitalize, getMostPlayedGameType} = require('./utils');
+
 
 router.get('/', getAllGames)
 router.post('/create_game',
   requireLogin,
-  createGame)
+  createGameHandler)
 
 
 
@@ -20,53 +23,31 @@ router.post('/create_game',
 function getAllGames(req, res, next) {
   GameModel
     .find()
+    .populate('winners')
+    .populate('losers')
+    .populate('createdBy')
+    .populate('updatedBy')
     .sort("updatedAt")
     .exec( (err, games) => {
       if(err) return next(err)
 
-      res.send({gameList: games, mostPlayedGameType: getMostPlayedGameType(games)})
+      const gameList = games.map(gameItem => {
+        let game = {}
+        game._id = gameItem._id
+        game.createdBy = capitalize(gameItem.createdBy.name)
+        game.updatedBy = capitalize(gameItem.updatedBy.name)
+        game.winners = gameItem.winners.map( player => capitalize(player.name))
+        game.losers = gameItem.losers.map( player => capitalize(player.name))
+        game.createdAt = gameItem.createdAt
+        game.updatedAt = gameItem.updatedAt
+        return game
+      })
+
+      res.send({gameList, mostPlayedGameType: getMostPlayedGameType(games)})
     })
 }
 
-function getMostPlayedGameType(gamesCollection) {
-  let gameTypes = [0,0,0]
-  let mostPlayedGameType = 3
-
-  gamesCollection.forEach( gameRecord => {
-    switch (gameRecord.winners.length) {
-      case 3:
-        gameTypes[0] += 1
-        break
-      case 4:
-        gameTypes[1] += 1
-        break
-      case 5:
-        gameTypes[2] += 1
-        break
-      default:
-        throw new Error("Team length must be 3,4,or 5")
-    }
-  })
-  
-  switch(gameTypes.lastIndexOf(Math.max(...gameTypes))) {
-    case 0:
-        mostPlayedGameType = 3
-      break
-    case 1:
-        mostPlayedGameType = 4
-      break
-    case 2:
-        mostPlayedGameType = 5
-      break
-    default:
-      throw new Error("team types is not valid")
-  }
-
-  return mostPlayedGameType
-}
-
-
-function createGame(req, res, next) {
+function createGameHandler(req, res, next) {
   const {winners, losers} = req.body,
         {sub: creatorId, admin} = req.user
   
