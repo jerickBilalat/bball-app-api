@@ -58,10 +58,10 @@ function signUpHandler(req, res, next) {
 }
 
 function generateToken(user) {
-  const timestamp = new Date().getTime()
+  const timestamp = Math.round(Date.now() / 1000)
   if(user.admin) {
-    const oneDay = timestamp + 86400000
-    return jwt.encode({ sub: user._id, iat: timestamp, admin: true, exp: oneDay }, secret)
+    const tenHours = Math.round(Date.now() / 1000 + 10 * 60 * 60)
+    return jwt.encode({ sub: user._id, iat: timestamp, admin: true, exp: tenHours }, secret)
   }
   
   return jwt.encode({ sub: user._id, iat: timestamp}, secret)
