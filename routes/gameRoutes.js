@@ -49,10 +49,8 @@ function getAllGames(req, res, next) {
 
 function createGameHandler(req, res, next) {
   const {winners, losers} = req.body,
-        {sub: creatorId, admin} = req.user
+        {sub: creatorId } = req.user
   
-  if(!admin) return res.status(401).send({error: {message: "User is not an admin"}})
-  console.log(req.user)
   // update player stats
   winners.forEach( playerId => {
     PlayerModel

@@ -8,7 +8,7 @@ const calculateWinningPercentage = (wins,losses) => {
 const calculateTotalGamesPlayed = (wins,losses) => {
   wins = Number.parseInt(wins);
   losses = Number.parseInt(losses);
-  return (wins + losses).toFixed();
+  return wins + losses;
 }
 
 function capitalize(string) {
