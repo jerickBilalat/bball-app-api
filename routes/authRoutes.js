@@ -3,6 +3,7 @@ const router = require('express').Router()
 
 const User = require('../models/userModel')
 const authenticateLocalLogin = require('../middleware/authenticateLocalLogin');
+const utils = require('./utils')
 
 // todo put secret in the env
 const secret = "pinoybball2019"
@@ -30,7 +31,7 @@ router.post('/signup', signUpHandler)
 function signInHandler(req, res, next) {
   const {name, _id} = req.user,
         token = generateToken(req.user)
-  res.send({user: {name, _id}, token })
+  res.send({user: {name: utils.capitalize(name), _id}, token })
 }
 
 function signUpHandler(req, res, next) {
@@ -39,7 +40,7 @@ function signUpHandler(req, res, next) {
   User.findOne({name}, (err, existingUser) => {
 
     if(err) return next(err)
-    if(existingUser) return res.status(422).send({error: "Player name is alraedy in use"})
+    if(existingUser) return res.status(422).send({error: {message: "Player name is already in use"}})
     
     // todo player sync with existing player record
     // if(Player.findOne({name}, (err, player) => {...}))
@@ -61,10 +62,10 @@ function generateToken(user) {
   const timestamp = Math.round(Date.now() / 1000)
   if(user.admin) {
     const tenHours = Math.round(Date.now() / 1000 + 10 * 60 * 60)
-    return jwt.encode({ sub: user._id, iat: timestamp, admin: true, exp: tenHours }, secret)
+    return jwt.encode({ sub: user._id, iat: timestamp, admin: true, exp: tenHours, name: utils.capitalize(user.name) }, secret)
   }
   
-  return jwt.encode({ sub: user._id, iat: timestamp}, secret)
+  return jwt.encode({ sub: user._id, iat: timestamp, name: utils.capitalize(user.name)}, secret)
 }
 
 module.exports = router
