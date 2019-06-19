@@ -10,10 +10,12 @@ const playerSchema = new Schema({
   },
   wins: {
     type: Number,
+    default: 0,
     required: true
   },
   losses: {
     type: Number,
+    default: 0,
     required: true 
   }
 })
