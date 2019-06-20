@@ -1,0 +1,4 @@
+{
+  "dbURI": "BBALL_DBURI",
+  "jwtSecret": "BBALL_SECRET"
+}

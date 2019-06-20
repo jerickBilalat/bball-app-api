@@ -1,12 +1,13 @@
 const jwt = require('jwt-simple')
 const router = require('express').Router()
+const config = require('config')
+const secret = config.get('jwtSecret')
 
 const User = require('../models/userModel')
 const authenticateLocalLogin = require('../middleware/authenticateLocalLogin');
 const utils = require('./utils')
 
-// todo put secret in the env
-const secret = "pinoybball2019"
+
 
 
 router.post('/signin',
