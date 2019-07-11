@@ -2,9 +2,16 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const morgan = require('morgan')
+
+if(config.util.getEnv('NODE_CONFIG_ENV') === "development") {
+  const morgan = require('morgan')
+}
+
 const config = require('config')
 const app = express();
+
+
+
 
 // routes
 const PlayerRoutes = require("./routes/playerRoutes")
